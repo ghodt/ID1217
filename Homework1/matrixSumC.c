@@ -160,12 +160,6 @@ void *Worker(void *arg) {
     printf("worker %d (pthread id %d) has started\n", myid, pthread_self());
 #endif
 
-    /* determine first and last rows of my strip */
-    //first = myid*stripSize;
-    //last = (myid == numWorkers - 1) ? (size - 1) : (first + stripSize - 1);
-
-    //int row;
-
     while(true){
 
         // atomic madman
