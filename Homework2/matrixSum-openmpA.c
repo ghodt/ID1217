@@ -56,11 +56,13 @@ int main(int argc, char *argv[]) {
   int minindex[2];
   int maxindexes[numWorkers * 2];
   int minindexes[numWorkers * 2];
+  //initialize to zero
   for(i = 0; i < numWorkers * 2; i++){
       maxindexes[i] = 0;
       minindexes[i] = 0;
   }
   bool used[numWorkers];
+  //initialize to false
   for(i = 0; i < numWorkers; i++)
     used[i] = false;
 
@@ -68,8 +70,8 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel for reduction (+:total) reduction (max:max) reduction (min:min) private(j)
   for (i = 0; i < size; i++){
     int id = omp_get_thread_num();
+    // max number of threads are not always used
     used[id] = true;
-    //printf("Thread ID: %d on row %d\n", omp_get_thread_num(), i);
     for (j = 0; j < size; j++){
       total += matrix[i][j];
       if(matrix[i][j] > max){
@@ -85,6 +87,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // implicit barrier
+
     for(i = 0; i < numWorkers * 2; i += 2){
         //printf("i: %d\n", i);
         //printf("maxx i: %d maxx i + 1: %d\n", maxindexes[i], maxindexes[i + 1]);
@@ -98,8 +102,6 @@ int main(int argc, char *argv[]) {
             minindex[1] = minindexes[i + 1];
         }
     }
-
-// implicit barrier
 
   end_time = omp_get_wtime();
 

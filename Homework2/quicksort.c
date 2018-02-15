@@ -1,21 +1,21 @@
 #ifndef _REENTRANT
 #define _REENTRANT
 #endif
-#include <pthread.h>
+#include <omp.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
 #include <sys/time.h>
 #define MAXSIZE 20
-#define MAXWORKERS 4
+#define MAXWORKERS 8
 
 void* quicksort(void* struc);
 int partitioning(int low, int high);
 
 double start_time, end_time; /* start and end times */
 
-/* timer - copied from matrixSum.c */
+/* timer - copied from matrixSum.c in HW1 */
 double read_timer() {
     static bool initialized = false;
     static struct timeval start;
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]){
 
     if (numWorkers > MAXWORKERS) numWorkers = MAXWORKERS;
 
-    //omp_set_num_threads(numWorkers);
+    omp_set_num_threads(numWorkers);
 
     struct Part partition = {0, arraySize - 1};
 
@@ -60,13 +60,10 @@ int main(int argc, char *argv[]){
 
     printf("\n");
     start_time = read_timer();
-    pthread_t start;
-    //pthread_create(&start, NULL, quicksort, &partition);
-    //pthread_join(start, NULL);
+
     quicksort(&partition);
     end_time = read_timer();
 
-    //printf("sorted??: ");
     if(print){
         for(i = 0; i < arraySize; i++){
             printf("%d ", a[i]);
@@ -75,7 +72,6 @@ int main(int argc, char *argv[]){
     }
 
     printf("sorted in: %g\n", end_time - start_time);
-    pthread_exit(NULL);
 }
 
 void swap(int a[], int i, int j){
@@ -99,15 +95,16 @@ void* quicksort(void* struc){
 
         struct Part left = {low, p - 1};
         struct Part right = {p + 1, high};
+
         #pragma omp task
             //struct Part left = {low, p - 1};
             quicksort(&left);
 
         #pragma omp task
             //struct Part right = {p + 1, high};
-            quicksort(&right);
+        quicksort(&right);
 
-        #pragma omp taskwait
+        //#pragma omp taskwait
         }
 }
 
