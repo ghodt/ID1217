@@ -1,2 +1,2 @@
 # ID1217
-Parallellprogrammering
+Labbar i ID1217 - Programmering av parallella system 
